@@ -5,11 +5,12 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InputMask from 'react-input-mask';
 
-// Dados de exemplo com jogadores famosos (Lewandowski e Modrić como cargos de loja)
+// Dados de exemplo com funcionários
 const funcionariosData = [
   { id: 1, nome: 'Gabriela Koch', cpf: '013.962.129-65', telefone: '(49) 99803-9192', cargo: 'Supervisor' },
-  { id: 2, nome: 'Cristiano Ronaldo', cpf: '070.707.070-77', telefone: '(49) 07070-7070', cargo: 'Gerente'},
+  { id: 2, nome: 'Cristiano Ronaldo', cpf: '070.707.070-77', telefone: '(49) 07070-7070', cargo: 'Gerente' },
   { id: 6, nome: 'Robert Lewandowski', cpf: '567.890.123-44', telefone: '(49) 95555-5555', cargo: 'Vendedor' },
   { id: 8, nome: 'Luka Modrić', cpf: '456.789.012-33', telefone: '(49) 98888-8888', cargo: 'Supervisor' }
 ];
@@ -48,13 +49,11 @@ const FuncionarioList = () => {
 
   // Função para editar um funcionário
   const editarFuncionario = (id) => {
-    // Aqui você pode abrir um modal ou redirecionar para outra página para edição
     console.log("Editar Funcionário com ID:", id);
   };
 
   // Função para visualizar um funcionário
   const visualizarFuncionario = (id) => {
-    // Aqui você pode abrir um modal ou uma página para visualizar os detalhes do funcionário
     console.log("Visualizar Funcionário com ID:", id);
   };
 
@@ -122,8 +121,8 @@ const FuncionarioList = () => {
         </Typography>
         <Button
           variant="contained"
-          color="primary" // Ajuste a cor para o lilás claro que você quer
-          sx={{ fontFamily: 'Poppins', backgroundColor: '#c1a5db' }} // Cor lilás claro
+          color="primary"
+          sx={{ fontFamily: 'Poppins', backgroundColor: '#c1a5db' }}
           onClick={abrirModal}
         >
           Novo Funcionário
@@ -154,34 +153,34 @@ const FuncionarioList = () => {
             onChange={handleChange}
             sx={{ mb: 2 }}
           />
-          <TextField
-            fullWidth
-            label="CPF"
-            name="cpf"
+          <InputMask
+            mask="999.999.999-99"
             value={novoFuncionario.cpf}
             onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
+          >
+            {(inputProps) => <TextField {...inputProps} fullWidth label="CPF" name="cpf" sx={{ mb: 2 }} />}
+          </InputMask>
           <TextField
             fullWidth
             label="Matrícula"
             name="matricula"
             value={novoFuncionario.matricula}
             onChange={handleChange}
+            inputMode="numeric"
             sx={{ mb: 2 }}
           />
-          <TextField
-            fullWidth
-            label="Telefone"
-            name="telefone"
+          <InputMask
+            mask="(99) 99999-9999"
             value={novoFuncionario.telefone}
             onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
+          >
+            {(inputProps) => <TextField {...inputProps} fullWidth label="Telefone" name="telefone" sx={{ mb: 2 }} />}
+          </InputMask>
           <TextField
             fullWidth
             label="Senha"
             name="senha"
+            type="password"
             value={novoFuncionario.senha}
             onChange={handleChange}
             sx={{ mb: 2 }}
