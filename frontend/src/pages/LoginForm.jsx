@@ -1,19 +1,58 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
+import { TextField, Button, Box, Typography, Paper, Alert, Snackbar } from "@mui/material";
 
 const LoginForm = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'error' }); // Estado para o Snackbar
 
     const onSubmit = (data) => {
-        if (data.usuario === 'abc' && data.senha === 'bolinhas') {
-            localStorage.setItem('loginRealizado', data.usuario);
+        let isAuthenticated = false;
+        let userGroup = null;
+        let actualUsername = data.usuario; // O nome de usuário que será armazenado/exibido
+
+        // DEFINIÇÕES DOS LOGINS LOCAIS
+        const localUser1 = 'abc';
+        const localPass1 = 'bolinhas';
+        const localGroup1 = 'usuario_comum'; // Exemplo de grupo para o login 'abc'
+
+        const localUser2Prefix = '@';
+        const localUser2 = 'admin'; // O nome de usuário sem o '@'
+        const localPass2 = 'bolinhas';
+        const localGroup2 = 'administrador'; // Grupo para o login '@admin' 
+
+        // 1. Tenta Login Local com prefixo '@'
+        if (data.usuario.startsWith(localUser2Prefix)) {
+            const tempUsername = data.usuario.substring(localUser2Prefix.length); // Remove o '@'
+            if (tempUsername === localUser2 && data.senha === localPass2) {
+                isAuthenticated = true;
+                userGroup = localGroup2;
+                actualUsername = localUser2; // Armazena 'admin' sem o '@' 
+            }
+        }
+        // 2. Se não foi autenticado pelo '@', tenta Login Local padrão (sem prefixo)
+        else if (data.usuario === localUser1 && data.senha === localPass1) {
+            isAuthenticated = true;
+            userGroup = localGroup1;
+            actualUsername = localUser1;
+        }
+
+        // 3. Processa o resultado da tentativa de login
+        if (isAuthenticated) {
+            localStorage.setItem('loginRealizado', actualUsername); // Armazena o nome de usuário (sem o @)
+            localStorage.setItem('userGroup', userGroup); // Armazena o grupo
             navigate('/home');
         } else {
-            alert("Usuário ou senha inválidos!");
+            // Se nenhuma das autenticações locais funcionou, assume que seria via API
+            // E como a API não está funcionando, exibe erro.
+            setSnackbar({ open: true, message: "Usuário ou senha inválidos. Tente '@admin' ou 'abc' com suas senhas.", severity: 'error' });
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
     };
 
     return (
@@ -69,10 +108,10 @@ const LoginForm = () => {
                         }}
                     />
 
-                    <Button 
-                        type="submit" 
-                        variant="contained" 
-                        fullWidth 
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        fullWidth
                         sx={{
                             mt: 2,
                             backgroundColor: '#B39DDB', // botão lilás mais suave
@@ -86,6 +125,12 @@ const LoginForm = () => {
                     </Button>
                 </form>
             </Paper>
+            {/* Snackbar para feedback de login */}
+            <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
